@@ -1,12 +1,10 @@
 #!/bin/bash
 
 #Установка апач и нгинкс в качестве бэкэнда и фронтенда соответственно
-dnf install httpd nginx
 mkdir /etc/httpd/sites-enabled/
 chmod 777 /etc/httpd/sites-enabled/
 cp ./nginx.conf /etc/nginx/nginx.conf
 cp ./httpd.conf /etc/httpd/conf/
-cp -r ./htm* /var/www/
 cp ./example.conf /etc/httpd/sites-enabled/
 systemctl restart nginx
 systemctl restart httpd
