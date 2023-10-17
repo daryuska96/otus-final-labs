@@ -1,0 +1,47 @@
+#!/bin/bash
+
+echo "Меняем хостнейм"
+hostnamectl set-hostname master-mysql #название устройства
+systemctl restart systemd-hostnamed
+echo "Офаем файрволл"
+systemctl disable firewalld #удаляем из автозагрузки firewalld
+systemctl stop firewalld #выключаем firewalld
+echo "Ставим другой файрвол"
+dnf install -q iptables-services #устанавливаем iptables 
+cp ./iptables.conf /etc/sysconfig/iptables.conf
+systemctl restart iptables
+systemctl enable iptables
+echo "Меняем сетевые настройки"
+cp ./eth0.nmconnection /etc/NetworkManager/system-connections
+systemctl restart NetworkManager
+#Выключение Selinux
+sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config  #изменяем положение селинукс
+setenforce 0 #выключаем селинукс
+#установка докера
+echo "Ставим докер"
+sudo yum install -y yum-utils 
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+systemctl start docker
+systemctl enable docker
+echo "Скачиваем яву"
+dnf install -q java #устнавливаем java-openjdk
+echo "Скачиваем образы"
+docker pull -q prom/prometheus #скачивание докер-образа прометеус
+docker pull -q grafana/grafana #скачивание докер-образа графаны
+docker pull -q prom/node-exporter #скачивание докер-образа node-exporter
+echo "Качаем архив еластика"
+wget -q https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.9.2-x86_64.rpm #скачивае пакета еластика
+echo "Качаем архив кибаны"
+wget -q https://artifacts.elastic.co/downloads/kibana/kibana-8.9.2-x86_64.rpm #скачиваение пакета кибаны
+echo "Качаем архив логсташа"
+wget -q https://artifacts.elastic.co/downloads/logstash/logstash-8.9.2-x86_64.rpm #скачивание пакета логсташ
+echo "Качаем архив файлбита"
+wget -q https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.9.2-x86_64.rpm #скачивание пакета бита
+echo "Разархивируем заархивированные архиватором архивы"
+unzip -q www.zip
+chmod 777 html1 html2 html0
+#Устанавливаем NGINX / APACHE
+dnf install -q nginx httpd
+cp -r ./htm* /var/www/
+echo "Подготовка успешно выполнена"
