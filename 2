@@ -27,17 +27,17 @@ systemctl enable docker
 echo "Скачиваем яву"
 dnf install -q java #устнавливаем java-openjdk
 echo "Скачиваем образы"
-docker pull -q prom/prometheus #скачивание докер-образа прометеус
-docker pull -q grafana/grafana #скачивание докер-образа графаны
-docker pull -q prom/node-exporter #скачивание докер-образа node-exporter
+docker pull prom/prometheus #скачивание докер-образа прометеус
+docker pull grafana/grafana #скачивание докер-образа графаны
+docker pull prom/node-exporter #скачивание докер-образа node-exporter
 echo "Качаем архив еластика"
-wget -q https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.9.2-x86_64.rpm #скачивае пакета еластика
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.9.2-x86_64.rpm #скачивае пакета еластика
 echo "Качаем архив кибаны"
-wget -q https://artifacts.elastic.co/downloads/kibana/kibana-8.9.2-x86_64.rpm #скачиваение пакета кибаны
+wget https://artifacts.elastic.co/downloads/kibana/kibana-8.9.2-x86_64.rpm #скачиваение пакета кибаны
 echo "Качаем архив логсташа"
-wget -q https://artifacts.elastic.co/downloads/logstash/logstash-8.9.2-x86_64.rpm #скачивание пакета логсташ
+wget https://artifacts.elastic.co/downloads/logstash/logstash-8.9.2-x86_64.rpm #скачивание пакета логсташ
 echo "Качаем архив файлбита"
-wget -q https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.9.2-x86_64.rpm #скачивание пакета бита
+wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.9.2-x86_64.rpm #скачивание пакета бита
 echo "Разархивируем заархивированные архиватором архивы"
 unzip -q www.zip
 chmod 777 html1 html2 html0
