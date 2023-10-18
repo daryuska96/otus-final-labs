@@ -10,11 +10,15 @@ systemctl restart nginx
 systemctl restart httpd
 #Установка докера с MySQL в качестве мастер сервера репликаций
 docker run -d --name=master_mysql --hostname=master -v $PWD/d0:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 mysql/mysql-server:8.0 --server-id=1 --log-bin=
-docker exec -it master_mysql mysql -uroot -pmypass -e "CREATE USER 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'slavepass';" -e "GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';" -e "SHOW MASTER STATUS;"
 #Установка мониторинга через докер
 docker run -d -p 9100:9100 --name=node_exporter prom/node-exporter
 docker run -d -p 9090:9090 --name=prometheus -v ./prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
 docker run -d -p 3000:3000 --name=grafana grafana/grafana
+#Донастройка докера
+docker exec -it master_mysql mysql -uroot -pmypass \
+  -e "CREATE USER 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'slavepass';" \
+  -e "GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';" \
+  -e "SHOW MASTER STATUS;"
 #Установка Elastic
 rpm --install elasticsearch-8.9.2-x86_64.rpm
 systemctl daemon-reload
