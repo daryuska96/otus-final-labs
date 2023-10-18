@@ -8,6 +8,7 @@ cp ./httpd.conf /etc/httpd/conf/
 cp ./example.conf /etc/httpd/sites-enabled/
 systemctl restart nginx
 systemctl restart httpd
+systemctl restart docker
 #Установка докера с MySQL в качестве мастер сервера репликаций
 docker run -d --name=master_mysql --hostname=master -v $PWD/d0:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 mysql/mysql-server:8.0 --server-id=1 --log-bin=
 #Установка мониторинга через докер
