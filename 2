@@ -6,7 +6,7 @@ systemctl restart systemd-hostnamed
 echo "Офаем файрволл"
 systemctl disable firewalld #удаляем из автозагрузки firewalld
 systemctl stop firewalld #выключаем firewalld
-echo "Ставим другой файрвол"
+echo "Ставим другой фаерволл"
 dnf install -q iptables-services #устанавливаем iptables 
 cp ./iptables.conf /etc/sysconfig/iptables.conf
 systemctl restart iptables
@@ -44,4 +44,6 @@ chmod 777 html1 html2 html0
 #Устанавливаем NGINX / APACHE
 dnf install -q nginx httpd
 cp -r ./htm* /var/www/
+#Рестартим докер после изменения настроек фаерволла
+systemctl restart docker
 echo "Подготовка успешно выполнена"
