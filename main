@@ -2,51 +2,48 @@
 
 #Установка апач и нгинкс в качестве бэкэнда и фронтенда соответственно
 echo "Копируем настройки старого сервера Apache и Nginx"
-mkdir /etc/httpd/sites-enabled/
-chmod 777 /etc/httpd/sites-enabled/
-cp ./nginx.conf /etc/nginx/nginx.conf
-cp ./httpd.conf /etc/httpd/conf/
-cp ./example.conf /etc/httpd/sites-enabled/
+mkdir /etc/httpd/sites-enabled/ #создаем папку с файлами наших сайтов
+chmod 755 /etc/httpd/sites-enabled/ #предоставляем на нее права
+cp ./nginx.conf /etc/nginx/nginx.conf #копируем конфиги NGINX
+cp ./httpd.conf /etc/httpd/conf/ #копируем конфиги Apache
+cp ./example.conf /etc/httpd/sites-enabled/ #копируем наши страницы сайтов в директорию
 echo "Рестарт вебсервера"
-systemctl restart nginx
-systemctl restart httpd
-systemctl restart docker
+systemctl restart nginx #рестартуем NGINX
+systemctl restart httpd #рестартуем Apache
+systemctl restart docker #рестартуем Docker
 echo "Установка докера с MySQL в качестве мастер сервера репликаций"
-docker run -d --name=master_mysql --hostname=master -v $PWD/d0:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 mysql/mysql-server:8.0 --server-id=1 --log-bin='mysql-bin-1.log'
+docker run -d --name=master_mysql --hostname=master -v $PWD/d0:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=mypass -p 3306:3306 mysql/mysql-server:8.0 --server-id=1 --log-bin='mysql-bin-1.log' #создаем контейнер с мастером
 echo "Установка мониторинга через докер"
-docker run -d -p 9100:9100 --name=node_exporter prom/node-exporter
-docker run -d -p 9090:9090 --name=prometheus -v ./prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
-docker run -d -p 3000:3000 --name=grafana grafana/grafana
+docker run -d -p 9100:9100 --name=node_exporter prom/node-exporter #создаем контейнер с нод-экспортером
+docker run -d -p 9090:9090 --name=prometheus -v ./prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus #создаем контейер с прометеусом
+docker run -d -p 3000:3000 --name=grafana grafana/grafana #создаем контйенер с графаной
 echo "Установка Elastic"
-rpm --install elasticsearch-8.9.2-x86_64.rpm
-systemctl daemon-reload
-systemctl start elasticsearch
-systemctl enable --now elasticsearch.service
-cp ./elasticsearch.yml /etc/elasticsearch/
-systemctl daemon-reload
-systemctl enable --now elasticsearch.service
-systemctl restart elasticsearch
-curl http://localhost:9200
+rpm --install elasticsearch-8.9.2-x86_64.rpm  #устанавливаем еластик
+systemctl daemon-reload #обновляем конфигурацию
+systemctl start elasticsearch #стартуем эластик
+systemctl enable --now elasticsearch.service #добавляем еластик в автозагрузку
+cp ./elasticsearch.yml /etc/elasticsearch/ #копируем наши настройки эластика 
+systemctl daemon-reload #обновляем конфигурацию
+systemctl restart elasticsearch #рестартуем еластик 
+curl http://localhost:9200 #курлим эластик
 echo "Установка Kibana"
-rpm --install kibana-8.9.2-x86_64.rpm
-systemctl daemon-reload
-systemctl enable --now kibana.service
-cp ./kibana.yml /etc/kibana/kibana.yml
-systemctl restart kibana
+rpm --install kibana-8.9.2-x86_64.rpm #устанавливаем кибану
+systemctl daemon-reload #обновляем конфигурацию
+systemctl enable --now kibana.service #добавляем кибану в автозагрузку
+cp ./kibana.yml /etc/kibana/kibana.yml #копируем настройки кибаны в директорию
+systemctl restart kibana #рестартуем кибану
 echo "Установка Logstash"
-rpm --install logstash-8.9.2-x86_64.rpm
-systemctl enable --now logstash.service
-cp ./logstash.yml /etc/logstash/logstash.yml
-cp ./logstash-nginx-es.conf /etc/logstash/conf.d/logstash-nginx-es.conf
-systemctl restart logstash.service
+rpm --install logstash-8.9.2-x86_64.rpm #устанавливаем логсташ
+systemctl enable --now logstash.service #добавляем логсташ в автозагрузку
+cp ./logstash.yml /etc/logstash/logstash.yml #копируем настройки логсташ в директорию
+cp ./logstash-nginx-es.conf /etc/logstash/conf.d/logstash-nginx-es.conf #копируем настройки логсташ в директорию
+systemctl restart logstash.service #рестартуем логсташ
 echo "Установка Filebeat"
-rpm --install filebeat-8.9.2-x86_64.rpm
-cp ./filebeat.yml /etc/filebeat/filebeat.yml
-systemctl restart filebeat
+rpm --install filebeat-8.9.2-x86_64.rpm #устанавливаем битс
+cp ./filebeat.yml /etc/filebeat/filebeat.yml #копируем настройки битса в директорию
+systemctl restart filebeat #рестартуем битс
 #Донастройка докера
-docker exec -it master_mysql mysql -uroot -pmypass -e "CREATE USER 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'slavepass';" 
-sleep 1
-docker exec -it master_mysql mysql -uroot -pmypass -e "GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';" 
-sleep 1
-docker exec -it master_mysql mysql -uroot -pmypass -e "SHOW MASTER STATUS;"
+docker exec -it master_mysql mysql -uroot -pmypass -e "CREATE USER 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'slavepass';" #создаем юзера
+docker exec -it master_mysql mysql -uroot -pmypass -e "GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';" #даем ему все привелегии для репликации
+docker exec -it master_mysql mysql -uroot -pmypass -e "SHOW MASTER STATUS;" #показываем статус мастер сервера
 
