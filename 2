@@ -13,6 +13,7 @@ systemctl restart iptables
 systemctl enable iptables
 echo "Меняем сетевые настройки"
 cp ./eth0.nmconnection /etc/NetworkManager/system-connections
+sleep 2
 systemctl restart NetworkManager
 #Выключение Selinux
 sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config  #изменяем положение селинукс
