@@ -6,7 +6,7 @@ mkdir /etc/httpd/sites-enabled/ #создаем папку с файлами н�
 chmod 755 /etc/httpd/sites-enabled/ #предоставляем на нее права
 cp ./nginx.conf /etc/nginx/nginx.conf #копируем конфиги NGINX
 cp ./httpd.conf /etc/httpd/conf/ #копируем конфиги Apache
-cp ./example.conf /etc/httpd/sites-enabled/ #копируем наши страницы сайтов в директорию
+cp ./example.conf /etc/httpd/sites-enabled/ #копируем данные о наших страниц сайтов в директорию
 echo "Рестарт вебсервера"
 systemctl restart nginx #рестартуем NGINX
 systemctl restart httpd #рестартуем Apache
