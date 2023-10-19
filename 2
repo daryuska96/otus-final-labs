@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Меняем хостнейм"
-hostnamectl set-hostname master-mysql #название устройства
+hostnamectl set-hostname mysql-master #название устройства
 systemctl restart systemd-hostnamed
 echo "Офаем файрволл"
 systemctl disable firewalld #удаляем из автозагрузки firewalld
