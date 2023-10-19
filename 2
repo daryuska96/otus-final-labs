@@ -2,29 +2,28 @@
 
 echo "Меняем хостнейм"
 hostnamectl set-hostname mysql-master #название устройства
-systemctl restart systemd-hostnamed
+systemctl restart systemd-hostnamed #перезапускаем службу
 echo "Офаем файрволл"
 systemctl disable firewalld #удаляем из автозагрузки firewalld
 systemctl stop firewalld #выключаем firewalld
 echo "Ставим другой фаерволл"
 dnf install -q -y iptables-services #устанавливаем iptables 
-cp ./iptables /etc/sysconfig/iptables
-systemctl restart iptables
-systemctl enable iptables
+cp ./iptables /etc/sysconfig/iptables #копируем требуемые настройки
+systemctl restart iptables #рестартуем службу
+systemctl enable iptables #добавляем в автозагрузку
 echo "Меняем сетевые настройки"
-cp ./eth0.nmconnection /etc/NetworkManager/system-connections
-sleep 2
-systemctl restart NetworkManager
+cp ./eth0.nmconnection /etc/NetworkManager/system-connections #копируем настройки сервера
+systemctl restart NetworkManager #рестартуем сетевую службу
 #Выключение Selinux
 sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config  #изменяем положение селинукс
 setenforce 0 #выключаем селинукс
 #установка докера
 echo "Ставим докер"
 sudo yum install -q -y yum-utils 
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo  #добавляем репозиторий для скачивания
 sudo yum install -q -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-systemctl start docker
-systemctl enable docker
+systemctl start docker #стартуем докер
+systemctl enable docker #добавляем в автозагрузку
 echo "Скачиваем яву"
 dnf install -q -y java #устнавливаем java-openjdk
 echo "Скачиваем образы"
@@ -45,7 +44,7 @@ unzip -q www.zip
 chmod 777 html1 html2 html0
 #Устанавливаем NGINX / APACHE
 dnf install -q -y nginx httpd
-cp -r ./htm* /var/www/
+cp -r ./htm* /var/www/  #копируем ресурсы сайтов
 #Рестартим докер после изменения настроек фаерволла
 systemctl restart docker
 echo "Подготовка успешно выполнена"
